@@ -1,15 +1,12 @@
-export function addImage(src, width, height) {
-  this.src = src;
+export function addImage(image, width, height) {
+  this.image = image;
   this.width = width || 0;
   this.height = height || 0;
 
   this.updateImage = function (world) {
-    const image = document.getElementById(this.src);
-    if (!image) {
-      throw new Error(`Couldn't find image for: '${this.src}', please register this as an image resource!`);
-    }
-    world.ctx.drawImage(image, this.x, this.y, this.width, this.height);
+    world.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
+
   this.updaters.push(this.updateImage.bind(this));
 }
   

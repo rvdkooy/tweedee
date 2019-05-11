@@ -22,12 +22,21 @@ export class GameWorld {
         const image = document.createElement('img');
         image.src = r.src;
         image.id = r.src;
+        image.dataset.name = r.name;
         resContainer.append(image);
       });
     }
 
     container.appendChild(resContainer);
     container.appendChild(canvas);
+  }
+
+  getResource(name) {
+    const resource = document.querySelector(`[data-name='${name}']`);
+    if (!resource) {
+      throw new Error(`Couldn't find resource for: '${name}', please register this as an image resource!`);
+    }
+    return resource;
   }
 
   start() {
@@ -64,16 +73,4 @@ export class GameWorld {
   //   this.listeners[type].push(cb);
   //   // return remove handler
   // }
-}
-
-export class GameObject {
-  constructor (x, y) {
-    this.x = x || 0;
-    this.y = y || 0;
-    this.updaters = [];
-  }
-
-  update(world) {
-    this.updaters.forEach(updater => updater(world, this));
-  }
 }

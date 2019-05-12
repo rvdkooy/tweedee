@@ -1,58 +1,23 @@
 export class GameWorld {
   constructor (selector, options) {
-    options = options || {};
+    this.options = options || {};
+    this.width = this.options.width || 1024;
+    this.height = this.options.height || 768;
 
     const container = document.querySelector(selector);
     const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 768;
+    canvas.width = this.width;
+    canvas.height = this.height;
     canvas.className = 'world';
 
     this.ctx = canvas.getContext("2d");
-    this.width = canvas.width;
-    this.height = canvas.height;
     this.gameObjects = [];
-    this.listeners = {};
-    
-    const resContainer = document.createElement('div');
-    resContainer.style.display = 'none';
-    
-    if (options.resources) {
-      options.resources.filter(r => r.type === 'image').forEach(r => {
-        const image = document.createElement('img');
-        image.src = r.src;
-        image.id = r.src;
-        image.dataset.name = r.name;
-        resContainer.append(image);
-      });
-    }
 
-    container.appendChild(resContainer);
+    addResources.bind(this)(container, this.options);
+    addKeyListeners.bind(this)();
+    addEventEmitter.bind(this)();
+
     container.appendChild(canvas);
-
-    document.addEventListener('keydown', (e) => {
-      if (this.listeners['keydown']) {
-        this.listeners['keydown'].forEach(listener => {
-          listener(e.keyCode);
-        });
-      }
-    });
-
-    document.addEventListener('keyup', (e) => {
-      if (this.listeners['keyup']) {
-        this.listeners['keyup'].forEach(listener => {
-          listener(e.keyCode);
-        });
-      }
-    });
-  }
-
-  getResource(name) {
-    const resource = document.querySelector(`[data-name='${name}']`);
-    if (!resource) {
-      throw new Error(`Couldn't find resource for: '${name}', please register this as an image resource!`);
-    }
-    return resource;
   }
 
   start() {
@@ -67,7 +32,7 @@ export class GameWorld {
     this.clear();
 
     this.gameObjects.forEach(gameObject => gameObject.update(this));
-
+    
     window.requestAnimationFrame(() => {
       this.gameLoop();
     });
@@ -75,12 +40,64 @@ export class GameWorld {
   insert(obj) {
     this.gameObjects.push(obj);
   }
+}
 
-  on(type, cb) {
+const addResources = function (container, options) {
+  const resContainer = document.createElement('div');
+  resContainer.style.display = 'none';
+    
+  if (options.resources) {
+    options.resources.filter(r => r.type === 'image').forEach(r => {
+      const image = document.createElement('img');
+      image.src = r.src;
+      image.id = r.src;
+      image.dataset.name = r.name;
+      resContainer.append(image);
+    });
+  }
+  container.appendChild(resContainer);
+
+  this.getResource = function (name) {
+    const resource = document.querySelector(`[data-name='${name}']`);
+    if (!resource) {
+      throw new Error(`Couldn't find resource for: '${name}', please register this as an image resource!`);
+    }
+    return resource;
+  }
+}
+
+const addEventEmitter = function () {
+  this.listeners = {};
+  
+  this.on = function(type, cb) {
     if (!this.listeners[type]) {
       this.listeners[type] = [];
     } 
     this.listeners[type].push(cb);
     // return remove handler
   }
+}
+
+const addKeyListeners = function() {
+  this.keysDown = [];
+  
+  document.addEventListener('keydown', (e) => {
+    this.keysDown.push(e.keyCode);
+    
+    if (this.listeners['keydown']) {
+      this.listeners['keydown'].forEach(listener => {
+        listener(e.keyCode);
+      });
+    }
+  });
+
+  document.addEventListener('keyup', (e) => {
+    this.keydown = this.keysDown.filter(x => x !== e.keyCode);
+    
+    if (this.listeners['keyup']) {
+      this.listeners['keyup'].forEach(listener => {
+        listener(e.keyCode);
+      });
+    }
+  });
 }

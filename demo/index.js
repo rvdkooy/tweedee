@@ -3,6 +3,13 @@ import { GameWorld } from '../src/engine/world';
 import { ImageObject } from '../src/engine/objects';
 import { keyCodes } from '../src/engine/utils';
 
+const keyCodeToDirectionMap = {
+  [keyCodes.arrowup]: 0,
+  [keyCodes.arrowright]: 90,
+  [keyCodes.arrowdown]: 180,
+  [keyCodes.arrowleft]: 270,
+}
+
 const world = new GameWorld('#container', {
   resources: [
     { type: 'image', name: 'background', src: 'static/background.jpg' },
@@ -16,27 +23,24 @@ const player = new ImageObject(world.getResource('player'), 70, 83);
 world.insert(background)
 world.insert(player);
 
-world.on('keydown', (keyCode) => {
-  if (keyCode === keyCodes.arrowleft) {
-    player.move(270, 4, { easeIn: true });
-  }
-  if (keyCode === keyCodes.arrowright) {
-    player.move(90, 4, { easeIn: true });
-  }
-  if (keyCode === keyCodes.arrowdown) {
-    player.move(180, 4, { easeIn: true });
-  }
-  if (keyCode === keyCodes.arrowup) {
-    player.move(0, 4, { easeIn: true });
-  }
+let previousDirection = null;
 
+world.on('keydown', (keyCode) => {
+  const direction = keyCodeToDirectionMap[keyCode];
+  Number.isInteger(direction) && player.move(direction, 4, { easeIn: true });
+
+  if (keyCode === keyCodes.arrowleft && previousDirection === 90 ||
+    keyCode === keyCodes.arrowright && previousDirection === 270) {
+    player.flipVertically();
+  }
+  if (keyCode === keyCodes.arrowleft || keyCode === keyCodes.arrowright) {
+    previousDirection = direction;
+  }
 });
 
 world.on('keyup', (keyCode) => {
-  if (keyCode === keyCodes.arrowleft || keyCode === keyCodes.arrowright ||
-    keyCode === keyCodes.arrowup || keyCode === keyCodes.arrowdown) {
-    player.stop();
-  }
+  const direction = keyCodeToDirectionMap[keyCode];
+  Number.isInteger(direction) && player.stop();
 });
 
 world.start();

@@ -2,12 +2,33 @@ export function addImage(image, width, height) {
   this.image = image;
   this.width = width || 0;
   this.height = height || 0;
+  this.scaleV = 1;
+  this.scaleH = 1;
 
   this.updateImage = function (world) {
-    world.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    if (this.scaleV === -1 || this.scaleH === -1) {
+      const x = (this.scaleV === -1) ? this.x * -1 : this.x;
+      const y = (this.scaleH === -1) ? this.y * -1 : this.y;
+
+      world.ctx.save();
+      world.ctx.translate(width, 0);
+      world.ctx.scale(this.scaleV, this.scaleH);
+      world.ctx.drawImage(this.image, x, y, this.width, this.height);
+      world.ctx.restore();
+    } else {
+      world.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    }
   }
 
   this.updaters.push(this.updateImage.bind(this));
+
+  this.flipVertically = function () {
+    this.scaleV = (this.scaleV === 1) ? -1 : 1;
+  }
+
+  this.flipHorizontally = function () {
+    this.scaleH = (this.scaleH === 1) ? -1 : 1;
+  }
 }
   
 export function addMovement() {

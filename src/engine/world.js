@@ -12,7 +12,7 @@ export class GameWorld {
     this.width = canvas.width;
     this.height = canvas.height;
     this.gameObjects = [];
-    // this.listeners = {};
+    this.listeners = {};
     
     const resContainer = document.createElement('div');
     resContainer.style.display = 'none';
@@ -29,6 +29,22 @@ export class GameWorld {
 
     container.appendChild(resContainer);
     container.appendChild(canvas);
+
+    document.addEventListener('keydown', (e) => {
+      if (this.listeners['keydown']) {
+        this.listeners['keydown'].forEach(listener => {
+          listener(e.keyCode);
+        });
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (this.listeners['keyup']) {
+        this.listeners['keyup'].forEach(listener => {
+          listener(e.keyCode);
+        });
+      }
+    });
   }
 
   getResource(name) {
@@ -50,12 +66,6 @@ export class GameWorld {
   gameLoop() {
     this.clear();
 
-    // if (this.listeners['gameLoop']) {
-    //   this.listeners['gameLoop'].forEach(listener => {
-    //     listener(this);
-    //   });
-    // }
-
     this.gameObjects.forEach(gameObject => gameObject.update(this));
 
     window.requestAnimationFrame(() => {
@@ -66,11 +76,11 @@ export class GameWorld {
     this.gameObjects.push(obj);
   }
 
-  // on(type, cb) {
-  //   if (!this.listeners[type]) {
-  //     this.listeners[type] = [];
-  //   } 
-  //   this.listeners[type].push(cb);
-  //   // return remove handler
-  // }
+  on(type, cb) {
+    if (!this.listeners[type]) {
+      this.listeners[type] = [];
+    } 
+    this.listeners[type].push(cb);
+    // return remove handler
+  }
 }

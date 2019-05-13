@@ -11,6 +11,7 @@ export const keyCodes = {
     pause: 19,
     capslock: 20,
     escape: 27,
+    space: 32,
     pageup: 33,
     pagedown: 34,
     end: 35,

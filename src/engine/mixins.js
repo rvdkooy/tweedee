@@ -51,21 +51,23 @@ export function addMovement() {
   }
   this.updateMovement = function () {
     if (Number.isInteger(this.direction)) {
-      if (this.options.easeIn && this.easeInValue < 10) {
+      if (this.options.easeIn && this.easeInValue < this.speed) {
         this.easeInValue += 1;
       }
 
+      let speed = (this.options.easeIn) ? this.easeInValue : this.speed;
+
       if (this.direction === 0) {
-        this.y = this.y - this.easeInValue - this.speed;
+        this.y = this.y - speed;
       }
       if (this.direction === 90) {
-        this.x = this.x + this.easeInValue + this.speed;
+        this.x = this.x + speed;
       }
       if (this.direction === 180) {
-        this.y = this.y + this.easeInValue + this.speed;
+        this.y = this.y + speed;
       }
       if (this.direction === 270) {
-        this.x = this.x - this.easeInValue - this.speed;
+        this.x = this.x - speed;
       }
     }
   }

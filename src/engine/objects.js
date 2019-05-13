@@ -20,4 +20,3 @@ export class ImageObject extends GameObject {
     addImage.bind(this)(image, width, height);
   }
 }
-

@@ -1,4 +1,4 @@
-import { GameObject } from "../src/engine/objects";
+import { GameObject, ImageObject } from "../src/engine/objects";
 import { addMovement } from '../src/engine/mixins';
 
 export class Bullet extends GameObject {
@@ -8,14 +8,21 @@ export class Bullet extends GameObject {
     this.radius = 5;
     addMovement.bind(this)();
     this.updaters.push(this.drawBullet.bind(this));
-    this.move(90, 15);
+    this.move(0, 15);
   }
 
   drawBullet(world) {
-    this.x = this.x + this.speed;
     world.ctx.beginPath();
     world.ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
     world.ctx.fillStyle = 'red';
     world.ctx.fill();
+  }
+}
+
+export class Enemy extends ImageObject {
+  constructor(image, width, height, x, y) {
+    super(image, width, height, x, y);
+    
+    this.move(180, 5);
   }
 }

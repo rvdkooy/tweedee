@@ -13,8 +13,8 @@ export class GameObject {
 }
 
 export class ImageObject extends GameObject {
-  constructor(image, width, height) {
-    super();
+  constructor(image, width, height, x, y) {
+    super(x, y);
     
     addMovement.bind(this)();
     addImage.bind(this)(image, width, height);

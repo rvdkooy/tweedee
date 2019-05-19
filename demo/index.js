@@ -18,9 +18,7 @@ const world = new GameWorld('#container', {
     { type: 'image', name: 'background', src: 'static/background.jpg' },
     { type: 'image', name: 'player', src: 'static/player.png' },
     { type: 'image', name: 'enemy', src: 'static/enemy.png' },
-  ],
-  width: 1024,
-  height: 768,
+  ]
 });
 
 const background = new ImageObject(world.getResource('background'), world.width, world.height);
@@ -51,8 +49,7 @@ const handleArrowKeys = (keyCode, player) => {
 
 const handleShootBullet = (keyCode) => {
   if(keyCode === keyCodes.space) {
-    const bullet = new Bullet((player.x + (player.width / 2)), (player.y + (player.height / 2)));
-    world.insert(bullet);
+    world.insert(new Bullet((player.x + (player.width / 2)), (player.y + (player.height / 2))));
   }
 };
 
@@ -63,7 +60,6 @@ world.on('keyup', (keyCode) => {
 
 setInterval(() => {
   const enemies = world.gameObjects.filter(g => g instanceof Enemy);
-  console.log(enemies.length);
   if (enemies.length < 3) {
     const randomX = getRandomInt((player.width / 2), world.width - (player.width / 2))
     world.insert(new Enemy(world.getResource('enemy'), 70, 75, randomX, 0));

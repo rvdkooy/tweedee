@@ -7,7 +7,7 @@ export class GameWorld {
     addResources.bind(this)(container, this.options);
     addKeyListeners.bind(this)();
     addEventEmitter.bind(this)();
-    addCanvas.bind(this)(container, this.options.width, this.options.height);
+    addCanvas.bind(this)(container, options.width, options.height);
     
     this.gameObjects = [];
   }
@@ -102,11 +102,11 @@ const addCanvas = function (container, width, height) {
     const windowHeight = window.innerHeight;
     const windowWidth = window.innerWidth;
     if (windowWidth > windowHeight) {
-      this.scale = ( windowHeight / height );
+      this.scale = ( windowHeight / this.height );
       canvas.width = this.scaler(this.width);
       canvas.height = this.scaler(this.height);
     } else {
-      this.scale = ( windowWidth / width );
+      this.scale = ( windowWidth / this.width );
       canvas.width = this.scaler(this.width);
       canvas.height = this.scaler(this.height);
     }

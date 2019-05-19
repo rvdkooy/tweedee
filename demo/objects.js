@@ -13,7 +13,7 @@ export class Bullet extends GameObject {
 
   drawBullet(world) {
     world.ctx.beginPath();
-    world.ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+    world.ctx.arc(world.scaler(this.x), world.scaler(this.y), world.scaler(this.radius), 0, 2 * Math.PI, false);
     world.ctx.fillStyle = 'red';
     world.ctx.fill();
   }

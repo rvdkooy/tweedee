@@ -1,23 +1,15 @@
 export class GameWorld {
   constructor (selector, options) {
     this.options = options || {};
-    this.width = this.options.width || 1024;
-    this.height = this.options.height || 768;
-
+    
     const container = document.querySelector(selector);
-    const canvas = document.createElement('canvas');
-    canvas.width = this.width;
-    canvas.height = this.height;
-    canvas.className = 'world';
-
-    this.ctx = canvas.getContext("2d");
-    this.gameObjects = [];
 
     addResources.bind(this)(container, this.options);
     addKeyListeners.bind(this)();
     addEventEmitter.bind(this)();
-
-    container.appendChild(canvas);
+    addCanvas.bind(this)(container, this.options.width, this.options.height);
+    
+    this.gameObjects = [];
   }
 
   start() {
@@ -100,4 +92,38 @@ const addKeyListeners = function() {
       });
     }
   });
-}
+};
+
+const addCanvas = function (container, width, height) {
+  this.width = width || 1024;
+  this.height = height || 769;
+  
+  this.calculateDimensions = function () {
+    const windowHeight = window.innerHeight;
+    const windowWidth = window.innerWidth;
+    if (windowWidth > windowHeight) {
+      this.scale = ( windowHeight / height );
+      canvas.width = this.scaler(this.width);
+      canvas.height = this.scaler(this.height);
+    } else {
+      this.scale = ( windowWidth / width );
+      canvas.width = this.scaler(this.width);
+      canvas.height = this.scaler(this.height);
+    }
+  };
+
+  this.scaler = function (input) {
+    return input * this.scale;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.className = 'world';
+  container.appendChild(canvas);
+  this.ctx = canvas.getContext("2d");
+
+  window.addEventListener('resize', () => {
+    this.calculateDimensions();
+  });
+
+  this.calculateDimensions();
+};

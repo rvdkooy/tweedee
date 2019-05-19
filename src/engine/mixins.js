@@ -11,12 +11,12 @@ export function addImage(image, width, height) {
       const y = (this.scaleH === -1) ? this.y * -1 : this.y;
 
       world.ctx.save();
-      world.ctx.translate(width, 0);
+      world.ctx.translate(world.scaler(this.width), 0);
       world.ctx.scale(this.scaleV, this.scaleH);
-      world.ctx.drawImage(this.image, x, y, this.width, this.height);
+      world.ctx.drawImage(this.image, world.scaler(x), world.scaler(y), world.scaler(this.width), world.scaler(this.height));
       world.ctx.restore();
     } else {
-      world.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+      world.ctx.drawImage(this.image, world.scaler(this.x), world.scaler(this.y), world.scaler(this.width), world.scaler(this.height));
     }
   }
 

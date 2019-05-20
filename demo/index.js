@@ -2,7 +2,7 @@
 import { GameWorld } from '../src/engine/world';
 import { ImageObject } from '../src/engine/objects';
 import { keyCodes } from '../src/engine/utils';
-import { Bullet, Enemy } from './objects';
+import { Bullet, Enemy, Player } from './objects';
 
 const getRandomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -18,20 +18,19 @@ const world = new GameWorld('#container', {
     { type: 'image', name: 'background', src: 'static/background.jpg' },
     { type: 'image', name: 'player', src: 'static/player.png' },
     { type: 'image', name: 'enemy', src: 'static/enemy.png' },
-  ]
+  ],
+  enableCollisionDetection: true,
 });
 
 const background = new ImageObject(world.getResource('background'), world.width, world.height);
-const player = new ImageObject(world.getResource('player'), 70, 83, (world.width / 2), 600);
-
-world.insert(background)
-world.insert(player);
+const player = new Player(world.getResource('player'), 70, 83, (world.width / 2), 600);
 
 let previousOrientation = 90;
 
 world.on('keydown', (keyCode) => {
   handleArrowKeys(keyCode, player);
   handleShootBullet(keyCode);
+  handleRestartGame(keyCode);
 });
 
 const handleArrowKeys = (keyCode, player) => {
@@ -53,12 +52,21 @@ const handleShootBullet = (keyCode) => {
   }
 };
 
+const handleRestartGame = (keyCode) => {
+  if(keyCode === keyCodes.space && world.isGameOver) {
+    player.x = (world.width / 2);
+    startTheGame();
+  }
+};
+
 world.on('keyup', (keyCode) => {
   const direction = keyCodeToDirectionMap[keyCode];
   Number.isInteger(direction) && player.stop();
 });
 
 setInterval(() => {
+  if (world.isGameOver) return;
+
   const enemies = world.gameObjects.filter(g => g instanceof Enemy);
   if (enemies.length < 3) {
     const randomX = getRandomInt((player.width / 2), world.width - (player.width / 2))
@@ -66,4 +74,17 @@ setInterval(() => {
   }
 }, 2000);
 
-world.start();
+world.on('collisionDetected', ({ subject, target }) => {
+  if ((subject instanceof Player && target instanceof Enemy)) {
+    world.gameOver();
+  }
+});
+
+const startTheGame = () => {
+  world.reset();
+  world.insert(background)
+  world.insert(player);
+  world.start();
+};
+
+startTheGame();

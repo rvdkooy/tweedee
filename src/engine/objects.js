@@ -20,3 +20,11 @@ export class ImageObject extends GameObject {
     addImage.bind(this)(image, width, height);
   }
 }
+
+export class CanvasObject extends GameObject {
+  constructor(updateFn) {
+    super(0, 0);
+    
+    this.updaters.push(updateFn);
+  }
+}

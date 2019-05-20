@@ -19,6 +19,12 @@ export class Bullet extends GameObject {
   }
 }
 
+export class Player extends ImageObject {
+  constructor(image, width, height, x, y) {
+    super(image, width, height, x, y);
+  }
+}
+
 export class Enemy extends ImageObject {
   constructor(image, width, height, x, y) {
     super(image, width, height, x, y);

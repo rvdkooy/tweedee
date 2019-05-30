@@ -51,6 +51,10 @@ export class GameWorld {
     this.gameObjects.push(obj);
   }
 
+  remove(obj) {
+    this.gameObjects = this.gameObjects.filter(go => go !== obj);
+  }
+
   showPopup (content) {
     const modal = document.createElement('div');
     modal.className = 'modal';
@@ -101,6 +105,14 @@ const addResources = function (container, options) {
       image.dataset.name = r.name;
       resContainer.append(image);
     });
+
+    options.resources.filter(r => r.type === 'sound').forEach(r => {
+      const audio = document.createElement('audio');
+      audio.src = r.src;
+      audio.id = r.src;
+      audio.dataset.name = r.name;
+      resContainer.append(audio);
+    });
   }
   container.appendChild(resContainer);
 
@@ -109,7 +121,7 @@ const addResources = function (container, options) {
     if (!resource) {
       throw new Error(`Couldn't find resource for: '${name}', please register this as an image resource!`);
     }
-    return resource;
+    return resource.cloneNode();
   }
 }
 

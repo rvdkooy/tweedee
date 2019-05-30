@@ -77,6 +77,7 @@ world.on('collisionDetected', ({ subject, target }) => {
       _scoreboard.add(10);
     } else {
       subject.move(270, (subject.speed * 1.5));
+      target.move(270, (target.speed * 1.5));
     }
   }
 });
@@ -110,7 +111,7 @@ const insertAstroids = () => {
 const startTheGame = () => {
   const spaceship = new Spaceship(world.getResource('spaceship'), 100, 60, (world.width / 8), (world.height / 2));
   const scoreboard = new Scoreboard();
-  const background = new Background(world.getResource('background'), world.width, world.height, { speed: 0.3, direction: 90 });
+  const background = new Background(world.getResource('background'), world.width, world.height);
   const exercises = new Exercises((world.width / 2), world.height - 50);
   _scoreboard = scoreboard;
   _spaceship = spaceship;

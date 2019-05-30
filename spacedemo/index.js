@@ -59,7 +59,6 @@ world.on('collisionDetected', ({ subject, target }) => {
     (subject instanceof Laser && target instanceof Spaceship)) {
       world.gameOver();
       world.getResource('crash').play();
-  
       world.showPopup({
         title: 'Game over!',
         text: 'Druk op de "enter" toets         om opnieuw te beginnen.',
@@ -87,12 +86,9 @@ world.on('afterGameLoop', () => {
   if (astroids.length === 0) {
     insertAstroids();
   } else {
-    astroids.forEach(astroid => {
-      if (astroid.x < 0 - (astroid.width * 2)) {
-        world.remove(astroid);
-      }
-    });
+    astroids.filter(astroid => astroid.x < 0 - (astroid.width * 2)).forEach(astroid => world.remove(astroid));
   }
+  world.gameObjects.filter(go => go instanceof Laser && (go.x + go.width) > world.width).forEach(laser => world.remove(laser));
 });
 
 const insertAstroids = () => {
@@ -130,5 +126,5 @@ const startTheGame = () => {
 
 world.showPopup({
   title: 'Welkom',
-  text: 'Ben je klaar om te beginnen, druk dan op de "enter" toets',
+  text: 'Ben je klaar om te beginnen, druk dan op de "enter" toets. Gebruik de pijltjes toetsen om je ruimteschip te besturen en de spatiebalk om een rots kapot te schieten.',
 });

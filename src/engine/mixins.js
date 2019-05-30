@@ -4,7 +4,7 @@ export function addImage(image, width, height) {
   this.height = height || 0;
   this.scaleV = 1;
   this.scaleH = 1;
-
+  
   this.updateImage = function (world) {
     if (this.scaleV === -1 || this.scaleH === -1) {
       const x = (this.scaleV === -1) ? this.x * -1 : this.x;

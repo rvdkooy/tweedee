@@ -1,7 +1,7 @@
 import { GameWorld } from '../src/engine/world';
-import { ImageObject } from '../src/engine/objects';
-import { keyCodes } from '../src/engine/utils';
-import { Spaceship, Laser, Scoreboard, Astroid } from './objects';
+import { Background } from '../src/engine/objects';
+import { keyCodes, getRandomInt } from '../src/engine/utils';
+import { Spaceship, Laser, Scoreboard, Astroid, Exercises } from './objects';
 
 const keyCodeToDirectionMap = {
   [keyCodes.arrowup]: 0,
@@ -16,19 +16,17 @@ const world = new GameWorld('#container', {
     { type: 'sound', name: 'shoot', src: 'static/shoot.wav' },
     { type: 'sound', name: 'explosion', src: 'static/explosion.wav' },
     { type: 'sound', name: 'crash', src: 'static/crash.wav' },
-
-    
     // { type: 'image', name: 'explosion', src: 'static/explosion.gif' },
   ],
   enableCollisionDetection: true,
 });
 
-let _spaceship, _scoreboard = null;
+let _spaceship, _scoreboard, _exercises = null;
 
 world.on('keydown', (keyCode) => {
   if (_spaceship) {
     handleArrowKeys(keyCode, _spaceship);
-    handleShootBullet(keyCode, _spaceship);
+    handleShootLaser(keyCode, _spaceship);
   }
   handleRestartGame(keyCode);
 });
@@ -43,9 +41,9 @@ world.on('keyup', (keyCode) => {
   Number.isInteger(direction) && _spaceship.stop();
 });
 
-const handleShootBullet = (keyCode, spaceship) => {
+const handleShootLaser = (keyCode, spaceship) => {
   if (keyCode === keyCodes.space) {
-    world.insert(new Laser((spaceship.x + (spaceship.width - 20)), (spaceship.y + (spaceship.height / 2))));
+    world.insert(new Laser((spaceship.x + (spaceship.width)), (spaceship.y + (spaceship.height / 2))));
     world.getResource('shoot').play();
   }
 };
@@ -57,44 +55,36 @@ const handleRestartGame = (keyCode) => {
 };
 
 world.on('collisionDetected', ({ subject, target }) => {
-  if ((subject instanceof Spaceship && target instanceof Astroid)) {
-    world.gameOver();
-    world.getResource('crash').play();
-
-    world.showPopup({
-      title: 'Game over!',
-      text: 'Druk op de "enter" toets om opnieuw te beginnen.',
-    });
+  if ((subject instanceof Spaceship && target instanceof Astroid) ||
+    (subject instanceof Laser && target instanceof Spaceship)) {
+      world.gameOver();
+      world.getResource('crash').play();
+  
+      world.showPopup({
+        title: 'Game over!',
+        text: 'Druk op de "enter" toets         om opnieuw te beginnen.',
+      });
   }
+  
   if ((subject instanceof Laser && target instanceof Astroid)) {
-    world.getResource('explosion').play();
-    world.remove(target);
-    world.remove(subject);
-    _scoreboard.add(10);
+    if (target.answer === _exercises.answer) {
+      world.getResource('explosion').play();
+      world.remove(target);
+      world.remove(subject);
+      world.gameObjects.filter(go => go instanceof Astroid).forEach(go => {
+        go.move(go.direction, go.speed * 3);
+      });
+      _scoreboard.add(10);
+    } else {
+      subject.move(270, (subject.speed * 1.5));
+    }
   }
 });
 
 world.on('afterGameLoop', () => {
-  insertAstroids();
-});
-
-const insertAstroids = () => {
   const astroids = world.gameObjects.filter(go => go instanceof Astroid);
   if (astroids.length === 0) {
-    const y = world.height / 3;
-
-    const answers = [20, 30, 40];
-
-    const astroid1 = new Astroid(world.getResource('astroid1'), 138, 151, (world.width - 150), ((y * 1) / 2) - 75, answers[0]);
-    const astroid2 = new Astroid(world.getResource('astroid1'), 138, 151, (world.width - 150), ((y * 2) / 2), answers[1]);
-    const astroid3 = new Astroid(world.getResource('astroid1'), 138, 151, (world.width - 150), ((y * 3) / 2) + 75, answers[2]);
-
-    world.insert(astroid1);
-    world.insert(astroid2);
-    world.insert(astroid3);
-
-    // world.insert();
-
+    insertAstroids();
   } else {
     astroids.forEach(astroid => {
       if (astroid.x < 0 - (astroid.width * 2)) {
@@ -102,27 +92,35 @@ const insertAstroids = () => {
       }
     });
   }
+});
+
+const insertAstroids = () => {
+  const y = world.height / 3;
+  _exercises.createNew();
+  const answers = _exercises.getRandomAnswers();
+  const astroid1 = new Astroid(world.getResource('astroid1'), 138, 151, (world.width - getRandomInt(130, 170)), ((y * 1) / 2) - 75, answers[0]);
+  const astroid2 = new Astroid(world.getResource('astroid1'), 138, 151, (world.width - getRandomInt(130, 170)), ((y * 2) / 2), answers[1]);
+  const astroid3 = new Astroid(world.getResource('astroid1'), 138, 151, (world.width - getRandomInt(130, 170)), ((y * 3) / 2) + 75, answers[2]);
+
+  world.insert(astroid1);
+  world.insert(astroid2);
+  world.insert(astroid3);
 }
-
-// const canvas = document.querySelector('#container canvas');
-// const explosion = document.createElement('img');
-// explosion.src = 'static/explosion.gif';
-// canvas.appendChild(explosion);
-// explosion.style.zIndex = 1000;
-
 
 const startTheGame = () => {
   const spaceship = new Spaceship(world.getResource('spaceship'), 100, 60, (world.width / 8), (world.height / 2));
-  // const explosion = new ImageObject(world.getResource('explosion'), 142, 200, (world.width / 2), (world.height / 2));
-  const scoreboard = new Scoreboard(20, 20);
-  const background = new ImageObject(world.getResource('background'), world.width, world.height);
+  const scoreboard = new Scoreboard();
+  const background = new Background(world.getResource('background'), world.width, world.height, { speed: 0.3, direction: 90 });
+  const exercises = new Exercises((world.width / 2), world.height - 50);
   _scoreboard = scoreboard;
   _spaceship = spaceship;
-  
+  _exercises = exercises;
+
   world.closePopup();
   world.reset();
   world.insert(background);
   world.insert(scoreboard);
+  world.insert(exercises);
   world.insert(spaceship);
   world.start();
 };

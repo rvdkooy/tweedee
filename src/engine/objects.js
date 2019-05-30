@@ -49,11 +49,11 @@ export class Background extends GameObject {
 }
 
 export class ImageObject extends GameObject {
-  constructor(image, width, height, x, y) {
+  constructor(image, x, y, width, height) {
     super(x, y);
 
     addMovement.bind(this)();
-    addImage.bind(this)(image, width, height);
+    addImage.bind(this)(image, width || image.width, height || image.height);
   }
 }
 

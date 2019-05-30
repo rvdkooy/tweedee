@@ -4,7 +4,7 @@ export function addImage(image, width, height) {
   this.height = height || 0;
   this.scaleV = 1;
   this.scaleH = 1;
-  
+
   this.updateImage = function (world) {
     if (this.scaleV === -1 || this.scaleH === -1) {
       const x = (this.scaleV === -1) ? this.x * -1 : this.x;
@@ -30,11 +30,12 @@ export function addImage(image, width, height) {
     this.scaleH = (this.scaleH === 1) ? -1 : 1;
   }
 }
-  
+
 export function addMovement() {
   this.direction = null;
   this.speed = 0;
   this.easeInValue = 0;
+  this.boundaries = null;
 
   this.move = function (direction, speed, options) {
     this.options = options || {};
@@ -44,11 +45,30 @@ export function addMovement() {
       this.speed = speed;
     }
   }
+
   this.stop = function () {
     this.direction = null;
     this.speed = 0;
     this.easeInValue = 0;
   }
+
+  this.checkBoundary = (speed) => {
+    if (this.boundaries) {
+      if (this.direction === 0 && this.y - speed <= this.boundaries.top) {
+        this.y = this.boundaries.top;
+        this.stop();
+      }
+      // if (this.direction === 90 && this.x + speed <= this.boundaries.top) {
+      //   this.y = this.boundaries.top;
+      //   this.stop();
+      // }
+      if (this.direction === 180 && (this.y + speed + this.height >= this.boundaries.bottom)) {
+        this.y = this.boundaries.bottom - this.height;
+        this.stop();
+      }
+    }
+  }
+
   this.updateMovement = function () {
     if (Number.isInteger(this.direction)) {
       if (this.options.easeIn && this.easeInValue < this.speed) {
@@ -56,6 +76,7 @@ export function addMovement() {
       }
 
       let speed = (this.options.easeIn) ? this.easeInValue : this.speed;
+      this.checkBoundary(speed);
 
       if (this.direction === 0) {
         this.y = this.y - speed;
@@ -65,11 +86,22 @@ export function addMovement() {
       }
       if (this.direction === 180) {
         this.y = this.y + speed;
+        
       }
       if (this.direction === 270) {
         this.x = this.x - speed;
       }
     }
   }
+
+  this.setBoundaries = function (top, right, bottom, left) {
+    this.boundaries = {
+      top: top,
+      right: right,
+      bottom: bottom,
+      left: left,
+    }
+  }
+
   this.updaters.push(this.updateMovement.bind(this));
 }

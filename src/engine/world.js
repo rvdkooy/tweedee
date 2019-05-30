@@ -1,5 +1,3 @@
-import { CanvasObject } from './objects';
-
 export class GameWorld {
   constructor (selector, options) {
     this.options = options || {};
@@ -197,20 +195,6 @@ const addCanvas = function (container, options) {
   this.ctx = canvas.getContext("2d");
   
   window.addEventListener('resize', () => this.calculateDimensions(canvas));
-  // setTimeout(() => {
-  //   this.gameObjects.push(new CanvasObject((world) => {
-  //     world.ctx = canvas.getContext("2d");
-  //     world.ctx.beginPath();
-  //     world.ctx.moveTo(0, 0);
-  //     world.ctx.strokeStyle = 'red  ';
-  //     world.ctx.lineWidth = 5;
-  //     world.ctx.lineTo(0, canvas.height);
-  //     world.ctx.lineTo(canvas.width, canvas.height);
-  //     world.ctx.lineTo(canvas.width, 0);
-  //     world.ctx.lineTo(0, 0);
-  //     world.ctx.stroke(); 
-  //   }));
-  // });
   canvas.focus();
 };
 

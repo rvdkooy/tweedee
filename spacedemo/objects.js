@@ -21,8 +21,8 @@ export class Laser extends GameObject {
 }
 
 export class Astroid extends ImageObject {
-  constructor(image, width, height, x, y, answer) {
-    super(image, width, height, x, y);
+  constructor(image, x, y, answer) {
+    super(image, x, y);
     this.answer = answer;
     addMovement.bind(this)();
     this.updaters.push(this.drawAnswer.bind(this));

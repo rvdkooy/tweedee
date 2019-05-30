@@ -53,7 +53,7 @@ const handleShootBullet = (keyCode) => {
 };
 
 const handleRestartGame = (keyCode) => {
-  if(keyCode === keyCodes.space && world.isGameOver) {
+  if(keyCode === keyCodes.space && (world.isGameOver || !world.started)) {
     player.x = (world.width / 2);
     startTheGame();
   }
@@ -77,14 +77,24 @@ setInterval(() => {
 world.on('collisionDetected', ({ subject, target }) => {
   if ((subject instanceof Player && target instanceof Enemy)) {
     world.gameOver();
+
+    world.showPopup({
+      title: 'Game over!',
+      text: 'Druk op de spatie balk om opnieuw te beginnen.',
+    });
   }
 });
 
 const startTheGame = () => {
+  world.closePopup();
   world.reset();
   world.insert(background)
   world.insert(player);
   world.start();
 };
 
-startTheGame();
+world.showPopup({
+  title: 'Welkom',
+  text: 'Ben je klaar om te beginnen, druk dan op de spatiebalk',
+});
+

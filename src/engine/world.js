@@ -5,19 +5,20 @@ export class GameWorld {
     this.options = options || {};
     this.gameObjects = [];
     this.isGameOver = false;
+    this.started = false;
+    this.container = document.querySelector(selector);
 
-    const container = document.querySelector(selector);
-
-    addResources.bind(this)(container, this.options);
+    addResources.bind(this)(this.container, this.options);
     addKeyListeners.bind(this)();
     addEventEmitter.bind(this)();
-    addCanvas.bind(this)(container, options);
+    addCanvas.bind(this)(this.container, options);
     if (options.enableCollisionDetection) {
       addCollisionDetection.bind(this)();
     }
   }
 
   start() {
+    this.started = true;
     this.isGameOver = false;
     this.gameLoop();
   }
@@ -48,6 +49,43 @@ export class GameWorld {
   }
   insert(obj) {
     this.gameObjects.push(obj);
+  }
+
+  showPopup (content) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.width = this.scaler(this.width) + 'px';
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+    
+    if (content.title) {
+      const title = document.createElement('h1');
+      title.innerHTML = content.title;
+      modalContent.appendChild(title);
+    }
+
+    if (content.text) {
+      const text = document.createElement('div');
+      text.innerHTML = content.text;
+      modalContent.appendChild(text);
+    }
+
+    if (content.buttons && content.buttons.length) {
+      content.buttons.forEach(b => {
+        const button = document.createElement('button');
+        button.innerHTML = b.text;
+        button.addEventListener('click', b.onClick);
+        modalContent.appendChild(button);
+      });
+    }
+    modal.appendChild(modalContent);
+    this.container.appendChild(modal);
+  }
+  closePopup () {
+    const modal = this.container.querySelector('.modal');
+    if (modal) {
+      modal.parentNode.removeChild(modal);
+    }
   }
 }
 
@@ -123,10 +161,14 @@ const addCanvas = function (container, options) {
     const windowWidth = window.innerWidth;
     if (windowWidth > windowHeight) {
       this.scale = ( windowHeight / this.height );
+      container.style.width = this.scaler(this.width) + 'px';
+      container.style.height = this.scaler(this.height) + 'px';
       canv.width = this.scaler(this.width);
       canv.height = this.scaler(this.height);
     } else {
       this.scale = ( windowWidth / this.width );
+      container.style.width = this.scaler(this.width) + 'px';
+      container.style.height = this.scaler(this.height) + 'px';
       canv.width = this.scaler(this.width);
       canv.height = this.scaler(this.height);
     }
@@ -138,7 +180,6 @@ const addCanvas = function (container, options) {
 
   const canvas = document.createElement('canvas');
   canvas.className = 'world';
-  
   container.appendChild(canvas);
   this.calculateDimensions(canvas);
   this.ctx = canvas.getContext("2d");

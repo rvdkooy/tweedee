@@ -1,4 +1,4 @@
-import { addMovement, addImage } from './mixins';
+import { addMovement, addImage, addEventEmitter } from './mixins';
 
 export class GameObject {
   constructor(x, y, width, height) {
@@ -44,6 +44,45 @@ export class Background extends GameObject {
         world.ctx.drawImage(this.image, Math.round(this.scrollValue + canvasWidth), 0, world.scaler(this.width), world.scaler(this.height));
         world.ctx.drawImage(this.image, Math.round(this.scrollValue), 0, world.scaler(this.width), world.scaler(this.height));
       }
+    }
+  }
+}
+
+export class SpriteSheetImageObject extends GameObject {
+  constructor(image, x, y, width, height) {
+    super(x, y, width, height);
+    this.image = image;
+    this.sWidth = width;
+    this.sHeight = height;
+
+    this.repeat = false;
+    this.frames = Math.round(image.width / width);
+    this.speed = 0;
+    this.currentFrame = 0;
+    this.updaters.push(this.drawSpritesheetImage.bind(this));
+
+    addEventEmitter.bind(this)();
+  }
+  drawSpritesheetImage(world) {
+    if (this.currentFrame >= this.frames) {
+      this.emit('done', this);
+      return;
+    } 
+
+    if (this.currentFrame >= this.frames && this.repeat) {
+      this.currentFrame = 0;
+      this.emit('repeat', this);
+    }
+
+    world.ctx.drawImage(this.image, (this.currentFrame * this.width), 0, 
+      this.sWidth, this.sHeight, world.scaler(this.x), world.scaler(this.y),
+      world.scaler(this.width), world.scaler(this.height));
+
+    this.speed = this.speed + 0.1;
+    const roundedSpeed = Math.round(this.speed);
+    this.currentFrame += roundedSpeed;
+    if (roundedSpeed === 1) {
+      this.speed = 0;
     }
   }
 }

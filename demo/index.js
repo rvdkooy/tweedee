@@ -89,6 +89,7 @@ const startTheGame = () => {
   world.closePopup();
   world.reset();
   world.insert(background)
+  world.insert(explosion)
   world.insert(player);
   world.start();
 };

@@ -1,3 +1,5 @@
+import { addEventEmitter } from './mixins';
+
 export class GameWorld {
   constructor (selector, options) {
     this.options = options || {};
@@ -120,26 +122,6 @@ const addResources = function (container, options) {
       throw new Error(`Couldn't find resource for: '${name}', please register this as an image resource!`);
     }
     return resource.cloneNode();
-  }
-}
-
-const addEventEmitter = function () {
-  this.listeners = {};
-  
-  this.on = function(type, cb) {
-    if (!this.listeners[type]) {
-      this.listeners[type] = [];
-    } 
-    this.listeners[type].push(cb);
-    // return remove handler
-  }
-
-  this.emit = function (eventName, arg) {
-    if (this.listeners[eventName]) {
-      this.listeners[eventName].forEach(listener => {
-        listener(arg);
-      });
-    }
   }
 }
 

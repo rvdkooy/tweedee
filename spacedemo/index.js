@@ -1,5 +1,5 @@
 import { GameWorld } from '../src/engine/world';
-import { Background } from '../src/engine/objects';
+import { Background, ImageObject,SpriteSheetImageObject } from '../src/engine/objects';
 import { keyCodes, getRandomInt } from '../src/engine/utils';
 import { Spaceship, Laser, Scoreboard, Astroid, Exercises } from './objects';
 
@@ -13,10 +13,10 @@ const world = new GameWorld('#container', {
     { type: 'image', name: 'background', src: 'static/background.png' },
     { type: 'image', name: 'spaceship', src: 'static/spaceship.png' },
     { type: 'image', name: 'astroid1', src: 'static/astroid_1.png' },
+    { type: 'image', name: 'explosionspritesheet', src: 'static/explosion.png' },
     { type: 'sound', name: 'shoot', src: 'static/shoot.wav' },
     { type: 'sound', name: 'explosion', src: 'static/explosion.wav' },
     { type: 'sound', name: 'crash', src: 'static/crash.wav' },
-    // { type: 'image', name: 'explosion', src: 'static/explosion.gif' },
   ],
   enableCollisionDetection: true,
 });
@@ -55,19 +55,36 @@ const handleRestartGame = (keyCode) => {
 };
 
 world.on('collisionDetected', ({ subject, target }) => {
+  const addExplosionTo = (x, y, cb) => {
+    const explosion = new SpriteSheetImageObject(world.getResource('explosionspritesheet'), x, y, 142, 200);
+    explosion.frames = 8;
+    explosion.on('done', () => {
+      world.remove(explosion);
+      cb && cb();
+    });
+    world.insert(explosion);
+  }
+  
+  
   if ((subject instanceof Spaceship && target instanceof Astroid) ||
-    (subject instanceof Laser && target instanceof Spaceship)) {
-      world.gameOver();
+    (subject instanceof Spaceship && target instanceof Laser)) {
+      world.remove(subject);
       world.getResource('crash').play();
-      world.showPopup({
-        title: 'Game over!',
-        text: 'Druk op de "enter" toets         om opnieuw te beginnen.',
+      addExplosionTo(subject.x, subject.y, () => {
+        world.gameOver();
+        world.showPopup({
+          title: 'Game over!',
+          text: 'Druk op de "enter" toets om opnieuw te beginnen.',
+        });
       });
   }
   
   if ((subject instanceof Laser && target instanceof Astroid)) {
     if (target.answer === _exercises.answer) {
       world.getResource('explosion').play();
+      
+      addExplosionTo(target.x, target.y);
+      
       world.remove(target);
       world.remove(subject);
       world.gameObjects.filter(go => go instanceof Astroid).forEach(go => {
@@ -111,6 +128,7 @@ const startTheGame = () => {
   const scoreboard = new Scoreboard();
   const background = new Background(world.getResource('background'), world.width, world.height);
   const exercises = new Exercises((world.width / 2), world.height - 50);
+  
   _scoreboard = scoreboard;
   _spaceship = spaceship;
   _exercises = exercises;

@@ -13,6 +13,7 @@ const world = new GameWorld('#container', {
     { type: 'image', name: 'background', src: 'static/background.png' },
     { type: 'image', name: 'spaceship', src: 'static/spaceship.png' },
     { type: 'image', name: 'astroid1', src: 'static/astroid_1.png' },
+    { type: 'image', name: 'dashboard', src: 'static/dashboard.png' },
     { type: 'image', name: 'explosionspritesheet', src: 'static/explosion.png' },
     { type: 'sound', name: 'shoot', src: 'static/shoot.wav' },
     { type: 'sound', name: 'explosion', src: 'static/explosion.wav' },
@@ -123,11 +124,11 @@ const insertAstroids = () => {
 
 const startTheGame = () => {
   const spaceship = new Spaceship(world.getResource('spaceship'), 100, (world.height / 2));
-  spaceship.setBoundaries(0, world.width, world.height, 0);
+  spaceship.setBoundaries(0, world.width, world.height - 120, 0);
   
-  const scoreboard = new Scoreboard();
   const background = new Background(world.getResource('background'), world.width, world.height);
-  const exercises = new Exercises((world.width / 2), world.height - 50);
+  const scoreboard = new Scoreboard(world.getResource('dashboard'), 0, world.height - 120);
+  const exercises = new Exercises();
   
   _scoreboard = scoreboard;
   _spaceship = spaceship;

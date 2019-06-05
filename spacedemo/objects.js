@@ -42,9 +42,9 @@ export class Spaceship extends ImageObject {
   }
 }
 
-export class Scoreboard extends GameObject {
-  constructor() {
-    super (20, 20);
+export class Scoreboard extends ImageObject {
+  constructor(image, width, height, x, y) {
+    super(image, width, height, x, y);
     this.updaters.push(this.drawScoreboard.bind(this));
     this.score = 0;
   }
@@ -54,9 +54,15 @@ export class Scoreboard extends GameObject {
   }
 
   drawScoreboard (world) {
-    world.ctx.font = '30px Arial';
+    world.ctx.save();
+    world.ctx.font = '70px Arial';
     world.ctx.fillStyle = 'white';
-    world.ctx.fillText(`Score: ${this.score}`, world.scaler(10), world.scaler(50));
+    world.ctx.textAlign = "center"; 
+    
+    world.ctx.fillText('Score', world.scaler(670), world.scaler(world.height - 45));
+    world.ctx.fillText(this.score, world.scaler(880), world.scaler(world.height - 45));
+
+    world.ctx.restore();
   }
 }
 
@@ -98,7 +104,10 @@ export class Exercises extends GameObject {
     world.ctx.font = '70px Arial';
     world.ctx.fillStyle = 'white';
     world.ctx.textAlign = "center"; 
-    world.ctx.fillText(this.text, world.scaler(this.x), world.scaler(this.y));
+
+    world.ctx.fillText('Som', world.scaler(120), world.scaler(world.height - 45));
+    world.ctx.fillText(this.text, world.scaler(340), world.scaler(world.height - 45));
+
     world.ctx.restore();
   }
 }

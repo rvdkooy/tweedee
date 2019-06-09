@@ -27,10 +27,11 @@ export class Astroid extends ImageObject {
     addMovement.bind(this)();
     this.updaters.push(this.drawAnswer.bind(this));
     this.move(270, 1);
+    this.fullSpeed = 3;
   }
 
   drawAnswer(world) {
-    world.ctx.font = '40px Arial';
+    world.ctx.font = `${world.scaler(40)}px Arial`;
     world.ctx.fillStyle = 'white';
     world.ctx.fillText(this.answer, world.scaler(this.x + 50), world.scaler(this.y + 85));
   }

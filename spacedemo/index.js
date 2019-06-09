@@ -89,12 +89,12 @@ world.on('collisionDetected', ({ subject, target }) => {
       world.remove(target);
       world.remove(subject);
       world.gameObjects.filter(go => go instanceof Astroid).forEach(go => {
-        go.move(go.direction, go.speed * 3);
+        go.move(go.direction, go.fullSpeed);
       });
       _scoreboard.add(10);
     } else {
       subject.move(270, (subject.speed * 1.5));
-      target.move(270, (target.speed * 1.5));
+      target.move(270, target.fullSpeed);
     }
   }
 });
@@ -144,6 +144,8 @@ const startTheGame = () => {
 };
 
 world.showPopup({
-  title: 'Welkom',
-  text: 'Ben je klaar om te beginnen, druk dan op de "enter" toets. Gebruik de pijltjes toetsen om je ruimteschip te besturen en de spatiebalk om een rots kapot te schieten.',
+  title: 'Klaar om te beginnen?',
+  text: [ 'Druk dan op de "enter" toets. <br /><br />',
+          'Gebruik de pijltjes toetsen om je ruimteschip te besturen en de spatiebalk om een rots te schieten',
+        ].join(' '),
 });

@@ -59,8 +59,11 @@ export class Scoreboard extends ImageObject {
     world.ctx.fillStyle = 'white';
     world.ctx.textAlign = "center"; 
     
-    world.ctx.fillText('Score', world.scaler(670), world.scaler(world.height - 45));
+    world.ctx.fillText('Score:', world.scaler(670), world.scaler(world.height - 45));
     world.ctx.fillText(this.score, world.scaler(880), world.scaler(world.height - 45));
+
+    world.ctx.fillText('Levens:', world.scaler(120), world.scaler(world.height - 45));
+    world.ctx.fillText("1", world.scaler(350), world.scaler(world.height - 45));
 
     world.ctx.restore();
   }
@@ -101,12 +104,11 @@ export class Exercises extends GameObject {
 
   updateExercise(world) {
     world.ctx.save();
-    world.ctx.font = '70px Arial';
+    world.ctx.font = '60px Arial';
     world.ctx.fillStyle = 'white';
     world.ctx.textAlign = "center"; 
 
-    world.ctx.fillText('Som', world.scaler(120), world.scaler(world.height - 45));
-    world.ctx.fillText(this.text, world.scaler(340), world.scaler(world.height - 45));
+    world.ctx.fillText('Som: ' + this.text, world.scaler(world.width / 2), world.scaler(50));
 
     world.ctx.restore();
   }

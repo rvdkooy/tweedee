@@ -1,5 +1,5 @@
 import { GameWorld } from '../src/engine/world';
-import { Background, ImageObject,SpriteSheetImageObject } from '../src/engine/objects';
+import { Background,SpriteSheetImageObject } from '../src/engine/objects';
 import { keyCodes, getRandomInt } from '../src/engine/utils';
 import { Spaceship, Laser, Scoreboard, Astroid, Exercises } from './objects';
 

@@ -1,10 +1,11 @@
 {
-  "name": "mathgame",
-  "version": "1.0.0",
+  "name": "tweedee",
+  "version": "0.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "dist/tweedee.js",
   "scripts": {
     "demo": "webpack --config ./demo/webpack.config.js -w",
+    "build": "webpack",
     "spacedemo": "webpack --config ./spacedemo/webpack.config.js -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

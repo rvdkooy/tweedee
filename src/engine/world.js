@@ -121,7 +121,7 @@ const addResources = function (container, options) {
     if (!resource) {
       throw new Error(`Couldn't find resource for: '${name}', please register this as an image resource!`);
     }
-    return resource.cloneNode();
+    return (resource.tagName === 'AUDIO') ? resource.cloneNode() : resource;
   }
 }
 

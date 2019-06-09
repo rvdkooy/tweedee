@@ -124,7 +124,7 @@ const insertAstroids = () => {
 
 const startTheGame = () => {
   const spaceship = new Spaceship(world.getResource('spaceship'), 100, (world.height / 2));
-  spaceship.setBoundaries(0, world.width, world.height - 120, 0);
+  spaceship.setBoundaries(40, world.width, world.height - 120, 0);
   
   const background = new Background(world.getResource('background'), world.width, world.height);
   const scoreboard = new Scoreboard(world.getResource('dashboard'), 0, world.height - 120);

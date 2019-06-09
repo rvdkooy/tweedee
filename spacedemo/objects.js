@@ -55,15 +55,14 @@ export class Scoreboard extends ImageObject {
 
   drawScoreboard (world) {
     world.ctx.save();
-    world.ctx.font = '70px Arial';
+    world.ctx.font = `${world.scaler(30)}px Arial`;
     world.ctx.fillStyle = 'white';
-    world.ctx.textAlign = "center"; 
+    world.ctx.textAlign = "left"; 
     
-    world.ctx.fillText('Score:', world.scaler(670), world.scaler(world.height - 45));
-    world.ctx.fillText(this.score, world.scaler(880), world.scaler(world.height - 45));
+    world.ctx.fillText('Score:  ' + this.score, world.scaler(20), world.scaler(30));
 
-    world.ctx.fillText('Levens:', world.scaler(120), world.scaler(world.height - 45));
-    world.ctx.fillText("1", world.scaler(350), world.scaler(world.height - 45));
+    // world.ctx.fillText('Levens:', world.scaler(120), world.scaler(world.height - 45));
+    // world.ctx.fillText("1", world.scaler(350), world.scaler(world.height - 45));
 
     world.ctx.restore();
   }
@@ -104,12 +103,11 @@ export class Exercises extends GameObject {
 
   updateExercise(world) {
     world.ctx.save();
-    world.ctx.font = '60px Arial';
+    world.ctx.font = `${world.scaler(60)}px Arial`;
     world.ctx.fillStyle = 'white';
     world.ctx.textAlign = "center"; 
-
-    world.ctx.fillText('Som: ' + this.text, world.scaler(world.width / 2), world.scaler(50));
-
+    world.ctx.fillText('Som:', world.scaler(280), world.scaler(world.height - 40));
+    world.ctx.fillText(this.text, world.scaler(510), world.scaler(world.height - 40));
     world.ctx.restore();
   }
 }

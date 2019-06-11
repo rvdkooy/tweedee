@@ -1,4 +1,6 @@
 import { addEventEmitter } from './mixins';
+import { Dimensions } from './objects';
+import { throws } from 'assert';
 
 export class GameWorld {
   constructor (selector, options) {
@@ -145,24 +147,23 @@ const addKeyListeners = function() {
 };
 
 const addCanvas = function (container, options) {
-  this.width = options.width || 1024;
-  this.height = options.height || 769;
+  this.dimensions = new Dimensions(options.width || 1024, options.height || 768);
   
   this.calculateDimensions = function (canv) {
     const windowHeight = window.innerHeight;
     const windowWidth = window.innerWidth;
     if (windowWidth > windowHeight) {
-      this.scale = ( windowHeight / this.height );
-      container.style.width = this.scaler(this.width) + 'px';
-      container.style.height = this.scaler(this.height) + 'px';
-      canv.width = this.scaler(this.width);
-      canv.height = this.scaler(this.height);
+      this.scale = ( windowHeight / this.dimensions.height );
+      container.style.width = this.scaler(this.dimensions.width) + 'px';
+      container.style.height = this.scaler(this.dimensions.height) + 'px';
+      canv.width = this.scaler(this.dimensions.width);
+      canv.height = this.scaler(this.dimensions.height);
     } else {
-      this.scale = ( windowWidth / this.width );
-      container.style.width = this.scaler(this.width) + 'px';
-      container.style.height = this.scaler(this.height) + 'px';
-      canv.width = this.scaler(this.width);
-      canv.height = this.scaler(this.height);
+      this.scale = ( windowWidth / this.dimensions.width );
+      container.style.width = this.scaler(this.dimensions.width) + 'px';
+      container.style.height = this.scaler(this.dimensions.height) + 'px';
+      canv.width = this.scaler(this.dimensions.width);
+      canv.height = this.scaler(this.dimensions.height);
     }
   };
 
@@ -182,13 +183,13 @@ const addCanvas = function (container, options) {
 
 const addCollisionDetection = function () {
   this.on('afterGameLoop', (world) => {
-    const collisionables = world.gameObjects.filter(x => x.x && x.y && x.width && x.height);
+    const collisionables = world.gameObjects.filter(x => x.point.x && x.point.y && x.dimensions.width && x.dimensions.height);
     collisionables.forEach(subject => {
       collisionables.filter(x => x !== subject).forEach(target => {
-        if (subject.x < target.x + target.width &&
-          subject.x + subject.width > target.x &&
-          subject.y < target.y + target.height &&
-          subject.y + subject.height > target.y) {
+        if (subject.point.x < target.point.x + target.dimensions.width &&
+          subject.point.x + subject.dimensions.width > target.point.x &&
+          subject.point.y < target.point.y + target.dimensions.height &&
+          subject.point.y + subject.dimensions.height > target.point.y) {
             world.emit('collisionDetected', { subject, target });
         }
       });

@@ -1,5 +1,5 @@
 import { GameWorld } from '../src/engine/world';
-import { Background,SpriteSheetImageObject } from '../src/engine/objects';
+import { Background,SpriteSheetImageObject, Dimensions, Point } from '../src/engine/objects';
 import { keyCodes, getRandomInt } from '../src/engine/utils';
 import { Spaceship, Laser, Scoreboard, Astroid, Exercises } from './objects';
 
@@ -44,7 +44,7 @@ world.on('keyup', (keyCode) => {
 
 const handleShootLaser = (keyCode, spaceship) => {
   if (keyCode === keyCodes.space) {
-    world.insert(new Laser((spaceship.x + (spaceship.width)), (spaceship.y + (spaceship.height / 2))));
+    world.insert(new Laser(new Point((spaceship.point.x + (spaceship.dimensions.width)), (spaceship.point.y + (spaceship.dimensions.height / 2)))));
     world.getResource('shoot').play();
   }
 };
@@ -56,12 +56,14 @@ const handleRestartGame = (keyCode) => {
 };
 
 world.on('collisionDetected', ({ subject, target }) => {
-  const addExplosionTo = (x, y, cb) => {
-    const explosion = new SpriteSheetImageObject(world.getResource('explosionspritesheet'), x, y, 142, 200);
+  const addExplosionTo = (point, cb) => {
+    const explosion = new SpriteSheetImageObject(world.getResource('explosionspritesheet'), point, new Dimensions(142, 200));
     explosion.frames = 8;
-    explosion.on('done', () => {
-      world.remove(explosion);
-      cb && cb();
+    explosion.on('afterUpdate', () => {
+      if (explosion.currentFrame >= explosion.frames) {
+        world.remove(explosion);
+        cb && cb();
+      }
     });
     world.insert(explosion);
   }
@@ -71,7 +73,7 @@ world.on('collisionDetected', ({ subject, target }) => {
     (subject instanceof Spaceship && target instanceof Laser)) {
       world.remove(subject);
       world.getResource('crash').play();
-      addExplosionTo(subject.x, subject.y, () => {
+      addExplosionTo(subject.point, () => {
         world.gameOver();
         world.showPopup({
           title: 'Game over!',
@@ -84,7 +86,7 @@ world.on('collisionDetected', ({ subject, target }) => {
     if (target.answer === _exercises.answer) {
       world.getResource('explosion').play();
       
-      addExplosionTo(target.x, target.y);
+      addExplosionTo(target.point);
       
       world.remove(target);
       world.remove(subject);
@@ -104,18 +106,18 @@ world.on('afterGameLoop', () => {
   if (astroids.length === 0) {
     insertAstroids();
   } else {
-    astroids.filter(astroid => astroid.x < 0 - (astroid.width * 2)).forEach(astroid => world.remove(astroid));
+    astroids.filter(astroid => astroid.point.x < 0 - (astroid.dimensions.width * 2)).forEach(astroid => world.remove(astroid));
   }
-  world.gameObjects.filter(go => go instanceof Laser && (go.x + go.width) > world.width).forEach(laser => world.remove(laser));
+  world.gameObjects.filter(go => go instanceof Laser && (go.point.x + go.dimensions.width) > world.dimensions.width).forEach(laser => world.remove(laser));
 });
 
 const insertAstroids = () => {
-  const y = world.height / 3;
+  const y = world.dimensions.height / 3;
   _exercises.createNew();
   const answers = _exercises.getRandomAnswers();
-  const astroid1 = new Astroid(world.getResource('astroid1'),(world.width - getRandomInt(130, 170)), ((y * 1) / 2) - 75, answers[0]);
-  const astroid2 = new Astroid(world.getResource('astroid1'), (world.width - getRandomInt(130, 170)), ((y * 2) / 2), answers[1]);
-  const astroid3 = new Astroid(world.getResource('astroid1'), (world.width - getRandomInt(130, 170)), ((y * 3) / 2) + 75, answers[2]);
+  const astroid1 = new Astroid(world.getResource('astroid1'), new Point((world.dimensions.width - getRandomInt(130, 170)), ((y * 1) / 2) - 75), answers[0]);
+  const astroid2 = new Astroid(world.getResource('astroid1'), new Point((world.dimensions.width - getRandomInt(130, 170)), ((y * 2) / 2)), answers[1]);
+  const astroid3 = new Astroid(world.getResource('astroid1'), new Point((world.dimensions.width - getRandomInt(130, 170)), ((y * 3) / 2) + 75), answers[2]);
 
   world.insert(astroid1);
   world.insert(astroid2);
@@ -123,11 +125,11 @@ const insertAstroids = () => {
 }
 
 const startTheGame = () => {
-  const spaceship = new Spaceship(world.getResource('spaceship'), 100, (world.height / 2));
-  spaceship.setBoundaries(40, world.width, world.height - 120, 0);
+  const spaceship = new Spaceship(world.getResource('spaceship'), new Point(100, (world.dimensions.height / 2)));
+  spaceship.setBoundaries(40, world.dimensions.width, world.dimensions.height - 120, 0);
   
-  const background = new Background(world.getResource('background'), world.width, world.height);
-  const scoreboard = new Scoreboard(world.getResource('dashboard'), 0, world.height - 120);
+  const background = new Background(world.getResource('background'), world.dimensions);
+  const scoreboard = new Scoreboard(world.getResource('dashboard'), new Point(0, world.dimensions.height - 120));
   const exercises = new Exercises();
   
   _scoreboard = scoreboard;

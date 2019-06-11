@@ -1,10 +1,10 @@
-import { ImageObject, GameObject } from '../src/engine/objects';
+import { ImageObject, GameObject, Dimensions } from '../src/engine/objects';
 import { addMovement } from '../src/engine/mixins';
 import { getRandomInt } from '../src/engine/utils';
 
 export class Laser extends GameObject {
-  constructor(x, y) {
-    super(x, y, 20, 5);
+  constructor(point) {
+    super(point, new Dimensions(20, 5));
     addMovement.bind(this)();
     this.updaters.push(this.drawLaser.bind(this));
     this.move(90, 15);
@@ -12,17 +12,17 @@ export class Laser extends GameObject {
 
   drawLaser(world) {
     world.ctx.beginPath();
-    world.ctx.moveTo(world.scaler(this.x), world.scaler(this.y));
-    world.ctx.lineTo(world.scaler(this.x) + this.width, world.scaler(this.y));
+    world.ctx.moveTo(world.scaler(this.point.x), world.scaler(this.point.y));
+    world.ctx.lineTo(world.scaler(this.point.x) + this.dimensions.width, world.scaler(this.point.y));
     world.ctx.strokeStyle = "#FF0000";
-    world.ctx.lineWidth = this.height;
+    world.ctx.lineWidth = this.dimensions.height;
     world.ctx.stroke(); 
   }
 }
 
 export class Astroid extends ImageObject {
-  constructor(image, x, y, answer) {
-    super(image, x, y);
+  constructor(image, point, answer) {
+    super(image, point);
     this.answer = answer;
     addMovement.bind(this)();
     this.updaters.push(this.drawAnswer.bind(this));
@@ -33,19 +33,19 @@ export class Astroid extends ImageObject {
   drawAnswer(world) {
     world.ctx.font = `${world.scaler(40)}px Arial`;
     world.ctx.fillStyle = 'white';
-    world.ctx.fillText(this.answer, world.scaler(this.x + 50), world.scaler(this.y + 85));
+    world.ctx.fillText(this.answer, world.scaler(this.point.x + 50), world.scaler(this.point.y + 85));
   }
 }
 
 export class Spaceship extends ImageObject {
-  constructor(image, width, height, x, y) {
-    super(image, width, height, x, y);
+  constructor(image, point, dimensions) {
+    super(image, point, dimensions);
   }
 }
 
 export class Scoreboard extends ImageObject {
-  constructor(image, width, height, x, y) {
-    super(image, width, height, x, y);
+  constructor(image, point) {
+    super(image, point);
     this.updaters.push(this.drawScoreboard.bind(this));
     this.score = 0;
   }
@@ -70,8 +70,8 @@ export class Scoreboard extends ImageObject {
 }
 
 export class Exercises extends GameObject {
-  constructor(x, y) {
-    super (x, y);
+  constructor(point) {
+    super (point);
     this.updaters.push(this.updateExercise.bind(this));
     this.text = "";
     this.answer = null;
@@ -107,8 +107,8 @@ export class Exercises extends GameObject {
     world.ctx.font = `${world.scaler(60)}px Arial`;
     world.ctx.fillStyle = 'white';
     world.ctx.textAlign = "center"; 
-    world.ctx.fillText('Som:', world.scaler(280), world.scaler(world.height - 40));
-    world.ctx.fillText(this.text, world.scaler(510), world.scaler(world.height - 40));
+    world.ctx.fillText('Som:', world.scaler(280), world.scaler(world.dimensions.height - 40));
+    world.ctx.fillText(this.text, world.scaler(510), world.scaler(world.dimensions.height - 40));
     world.ctx.restore();
   }
 }

@@ -1,22 +1,21 @@
-export function addImage(image, width, height) {
+export function addImage(image, dimensions) {
   this.image = image;
-  this.width = width || 0;
-  this.height = height || 0;
+  this.dimensions = dimensions;
   this.scaleV = 1;
   this.scaleH = 1;
 
   this.updateImage = function (world) {
     if (this.scaleV === -1 || this.scaleH === -1) {
-      const x = (this.scaleV === -1) ? this.x * -1 : this.x;
-      const y = (this.scaleH === -1) ? this.y * -1 : this.y;
+      const x = (this.scaleV === -1) ? this.point.x * -1 : this.point.x;
+      const y = (this.scaleH === -1) ? this.point.y * -1 : this.point.y;
 
       world.ctx.save();
-      world.ctx.translate(world.scaler(this.width), 0);
+      world.ctx.translate(world.scaler(this.dimensions.width), 0);
       world.ctx.scale(this.scaleV, this.scaleH);
-      world.ctx.drawImage(this.image, world.scaler(x), world.scaler(y), world.scaler(this.width), world.scaler(this.height));
+      world.ctx.drawImage(this.image, world.scaler(x), world.scaler(y), world.scaler(this.dimensions.width), world.scaler(this.dimensions.height));
       world.ctx.restore();
     } else {
-      world.ctx.drawImage(this.image, world.scaler(this.x), world.scaler(this.y), world.scaler(this.width), world.scaler(this.height));
+      world.ctx.drawImage(this.image, world.scaler(this.point.x), world.scaler(this.point.y), world.scaler(this.dimensions.width), world.scaler(this.dimensions.height));
     }
   }
 
@@ -54,16 +53,16 @@ export function addMovement() {
 
   this.checkBoundary = (speed) => {
     if (this.boundaries) {
-      if (this.direction === 0 && this.y - speed <= this.boundaries.top) {
-        this.y = this.boundaries.top;
+      if (this.direction === 0 && this.point.y - speed <= this.boundaries.top) {
+        this.point.y = this.boundaries.top;
         this.stop();
       }
       // if (this.direction === 90 && this.x + speed <= this.boundaries.top) {
       //   this.y = this.boundaries.top;
       //   this.stop();
       // }
-      if (this.direction === 180 && (this.y + speed + this.height >= this.boundaries.bottom)) {
-        this.y = this.boundaries.bottom - this.height;
+      if (this.direction === 180 && (this.point.y + speed + this.dimensions.height >= this.boundaries.bottom)) {
+        this.point.y = this.boundaries.bottom - this.dimensions.height;
         this.stop();
       }
     }
@@ -79,17 +78,17 @@ export function addMovement() {
       this.checkBoundary(speed);
 
       if (this.direction === 0) {
-        this.y = this.y - speed;
+        this.point.y = this.point.y - speed;
       }
       if (this.direction === 90) {
-        this.x = this.x + speed;
+        this.point.x = this.point.x + speed;
       }
       if (this.direction === 180) {
-        this.y = this.y + speed;
+        this.point.y = this.point.y + speed;
         
       }
       if (this.direction === 270) {
-        this.x = this.x - speed;
+        this.point.x = this.point.x - speed;
       }
     }
   }

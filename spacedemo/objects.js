@@ -1,11 +1,10 @@
-import { ImageObject, GameObject, Dimensions } from '../src/engine/objects';
-import { addMovement } from '../src/engine/mixins';
-import { getRandomInt } from '../src/engine/utils';
+import { GameObject, Dimensions } from '../src/objects';
+import { movement, collisions, createImageBehaviour } from '../src/behaviours';
+import { getRandomInt } from '../src/utils';
 
 export class Laser extends GameObject {
   constructor(point) {
-    super(point, new Dimensions(20, 5));
-    addMovement.bind(this)();
+    super(point, new Dimensions(20, 5), [movement, collisions]);
     this.updaters.push(this.drawLaser.bind(this));
     this.move(90, 15);
   }
@@ -20,14 +19,17 @@ export class Laser extends GameObject {
   }
 }
 
-export class Astroid extends ImageObject {
+export class Astroid extends GameObject {
   constructor(image, point, answer) {
-    super(image, point);
+    super(point, new Dimensions(image.width, image.height), [
+      createImageBehaviour(image),
+      movement,
+      collisions
+    ]);
     this.answer = answer;
-    addMovement.bind(this)();
     this.updaters.push(this.drawAnswer.bind(this));
-    this.move(270, 1);
-    this.fullSpeed = 3;
+    this.fullSpeed = 5;
+    this.move(270, 2);
   }
 
   drawAnswer(world) {
@@ -37,15 +39,21 @@ export class Astroid extends ImageObject {
   }
 }
 
-export class Spaceship extends ImageObject {
-  constructor(image, point, dimensions) {
-    super(image, point, dimensions);
+export class Spaceship extends GameObject {
+  constructor(image, point) {
+    super(point, new Dimensions(image.width, image.height), [
+      createImageBehaviour(image),
+      movement,
+      collisions
+    ]);
   }
 }
 
-export class Scoreboard extends ImageObject {
+export class Scoreboard extends GameObject {
   constructor(image, point) {
-    super(image, point);
+    super(point, Dimensions.none(), [
+      createImageBehaviour(image),
+    ]);
     this.updaters.push(this.drawScoreboard.bind(this));
     this.score = 0;
   }
@@ -59,12 +67,7 @@ export class Scoreboard extends ImageObject {
     world.ctx.font = `${world.scaler(30)}px Arial`;
     world.ctx.fillStyle = 'white';
     world.ctx.textAlign = "left"; 
-    
     world.ctx.fillText('Score:  ' + this.score, world.scaler(20), world.scaler(30));
-
-    // world.ctx.fillText('Levens:', world.scaler(120), world.scaler(world.height - 45));
-    // world.ctx.fillText("1", world.scaler(350), world.scaler(world.height - 45));
-
     world.ctx.restore();
   }
 }

@@ -1,16 +1,16 @@
-import { GameWorld } from './engine/world';
-import * as mixins from './engine/mixins';
-import * as objects from './engine/objects';
-import * as utils from './engine/utils';
+import { GameWorld } from './world';
+import * as behaviours from './behaviours';
+import * as objects from './objects';
+import * as utils from './utils';
 
 export default {
     GameWorld,
-    mixins,
+    behaviours,
     objects,
     utils,
 }
 
 export { GameWorld };
-export { mixins };
+export { behaviours };
 export { objects };
 export { utils };

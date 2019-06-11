@@ -1,6 +1,5 @@
-import { addEventEmitter } from './mixins';
+import eventEmitter from './behaviours/eventEmitter';
 import { Dimensions } from './objects';
-import { throws } from 'assert';
 
 export class GameWorld {
   constructor (selector, options) {
@@ -12,7 +11,7 @@ export class GameWorld {
 
     addResources.bind(this)(this.container, this.options);
     addKeyListeners.bind(this)();
-    addEventEmitter.bind(this)();
+    eventEmitter.bind(this)();
     addCanvas.bind(this)(this.container, options);
     if (options.enableCollisionDetection) {
       addCollisionDetection.bind(this)();
@@ -183,7 +182,7 @@ const addCanvas = function (container, options) {
 
 const addCollisionDetection = function () {
   this.on('afterGameLoop', (world) => {
-    const collisionables = world.gameObjects.filter(x => x.point.x && x.point.y && x.dimensions.width && x.dimensions.height);
+    const collisionables = world.gameObjects.filter(x => x.collisionDetection);
     collisionables.forEach(subject => {
       collisionables.filter(x => x !== subject).forEach(target => {
         if (subject.point.x < target.point.x + target.dimensions.width &&

@@ -1,6 +1,6 @@
-import { GameWorld } from '../src/engine/world';
-import { Background,SpriteSheetImageObject, Dimensions, Point } from '../src/engine/objects';
-import { keyCodes, getRandomInt } from '../src/engine/utils';
+import { GameWorld } from '../src/world';
+import { Background,SpriteSheetObject, Dimensions, Point } from '../src/objects';
+import { keyCodes, getRandomInt } from '../src/utils';
 import { Spaceship, Laser, Scoreboard, Astroid, Exercises } from './objects';
 
 const keyCodeToDirectionMap = {
@@ -57,7 +57,7 @@ const handleRestartGame = (keyCode) => {
 
 world.on('collisionDetected', ({ subject, target }) => {
   const addExplosionTo = (point, cb) => {
-    const explosion = new SpriteSheetImageObject(world.getResource('explosionspritesheet'), point, new Dimensions(142, 200));
+    const explosion = new SpriteSheetObject(world.getResource('explosionspritesheet'), point, new Dimensions(142, 200));
     explosion.frames = 8;
     explosion.on('afterUpdate', () => {
       if (explosion.currentFrame >= explosion.frames) {

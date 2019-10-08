@@ -6,7 +6,7 @@ export class Laser extends GameObject {
   constructor(point) {
     super(point, new Dimensions(20, 5), [movement, collisions]);
     this.updaters.push(this.drawLaser.bind(this));
-    this.move(90, 15);
+    this.move(0, 15);
   }
 
   drawLaser(world) {
@@ -29,7 +29,7 @@ export class Astroid extends GameObject {
     this.answer = answer;
     this.updaters.push(this.drawAnswer.bind(this));
     this.fullSpeed = 5;
-    this.move(270, 2);
+    this.move(180, 2);
   }
 
   drawAnswer(world) {

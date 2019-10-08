@@ -4,8 +4,8 @@ import { keyCodes, getRandomInt } from '../src/utils';
 import { Spaceship, Laser, Scoreboard, Astroid, Exercises } from './objects';
 
 const keyCodeToDirectionMap = {
-  [keyCodes.arrowup]: 0,
-  [keyCodes.arrowdown]: 180,
+  [keyCodes.arrowup]: 90,
+  [keyCodes.arrowdown]: 270,
 };
 
 const world = new GameWorld('#container', {
@@ -95,8 +95,8 @@ world.on('collisionDetected', ({ subject, target }) => {
       });
       _scoreboard.add(10);
     } else {
-      subject.move(270, (subject.speed * 1.5));
-      target.move(270, target.fullSpeed);
+      subject.move(180, (subject.speed * 1.5));
+      target.move(180, target.fullSpeed);
     }
   }
 });

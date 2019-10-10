@@ -33,7 +33,7 @@ export class GameWorld {
   }
 
   clear() {
-    this.ctx.clearRect(0, 0, this.width, this.height)
+    this.ctx.clearRect(0, 0, this.scaler(this.dimensions.width), this.scaler(this.dimensions.height));
   }
 
   gameLoop() {

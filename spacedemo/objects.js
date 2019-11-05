@@ -1,4 +1,4 @@
-import { GameObject, Dimensions } from '../src/objects';
+import { GameObject, Dimensions, Point } from '../src/objects';
 import { movement, collisions, createImageBehaviour } from '../src/behaviours';
 import { getRandomInt } from '../src/utils';
 
@@ -68,6 +68,73 @@ export class Scoreboard extends GameObject {
     world.ctx.fillStyle = 'white';
     world.ctx.textAlign = "left"; 
     world.ctx.fillText('Score:  ' + this.score, world.scaler(20), world.scaler(30));
+    world.ctx.restore();
+  }
+}
+
+export class TouchButtons extends GameObject {
+  constructor(worldDimensions) {
+    super(Point.none());
+    this.upButtonDimensions = new GameObject(new Point(20, worldDimensions.height - 160), new Dimensions(80, 50));
+    this.downButtonDimensions = new GameObject(new Point(20, worldDimensions.height - 80), new Dimensions(80, 50));
+    this.shootButtonDimensions = new GameObject(
+      new Point(worldDimensions.width - 120, worldDimensions.height - 140),
+      new Dimensions(70, 70),
+    );
+    this.updaters.push(this.updateTouchButtons.bind(this));
+  }
+
+  updateUpButton(world) {
+    world.ctx.fillStyle = 'grey';
+    world.ctx.strokeStyle = "black";
+    world.ctx.lineWidth = 3;
+    world.ctx.beginPath();
+
+    const { point, dimensions } = this.upButtonDimensions;
+    world.ctx.moveTo(world.scaler(point.x + dimensions.width / 2), world.scaler(point.y));
+    world.ctx.lineTo(world.scaler(point.x + dimensions.width), world.scaler(point.y + dimensions.height));
+    world.ctx.lineTo(world.scaler(point.x), world.scaler(point.y + dimensions.height));
+    world.ctx.lineTo(world.scaler(point.x + dimensions.width / 2), world.scaler(point.y));
+    world.ctx.stroke();
+    world.ctx.fill();
+  }
+
+  updateDownButton(world) {
+    world.ctx.fillStyle = 'grey';
+    world.ctx.strokeStyle = "black";
+    world.ctx.lineWidth = 3;
+    world.ctx.beginPath();
+
+    const { point, dimensions } = this.downButtonDimensions;
+    world.ctx.moveTo(world.scaler(point.x), world.scaler(point.y));
+    world.ctx.lineTo(world.scaler(point.x + dimensions.width), world.scaler(point.y));
+    world.ctx.lineTo(world.scaler(point.x + (dimensions.width / 2)), world.scaler(point.y + dimensions.height));
+    world.ctx.lineTo(world.scaler(point.x), world.scaler(point.y));
+    world.ctx.stroke();
+    world.ctx.fill();
+  }
+
+  updateShootButton(world) {
+    world.ctx.fillStyle = '#991a00';
+    world.ctx.strokeStyle = "black";
+    world.ctx.lineWidth = 3;
+    world.ctx.beginPath();
+
+    const { point, dimensions } = this.shootButtonDimensions;
+    world.ctx.arc(
+      world.scaler(point.x + (dimensions.width / 2)),
+      world.scaler(point.y + (dimensions.height / 2)),
+      world.scaler(dimensions.width / 2), 0, Math.PI * 2, true
+    );
+    world.ctx.stroke();
+    world.ctx.fill();
+  }
+
+  updateTouchButtons(world) {
+    world.ctx.save();
+    this.updateUpButton(world);
+    this.updateDownButton(world);
+    this.updateShootButton(world);
     world.ctx.restore();
   }
 }

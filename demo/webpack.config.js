@@ -8,5 +8,6 @@ module.exports = {
     filename: "bundle.js",
   },
   target: 'web',
-  context: __dirname
+  context: __dirname,
+  devtool: 'source-map',
 }

@@ -1,7 +1,11 @@
 import { GameWorld } from '../src/world';
-import { Background,SpriteSheetObject, Dimensions, Point } from '../src/objects';
-import { keyCodes, getRandomInt } from '../src/utils';
-import { Spaceship, Laser, Scoreboard, Astroid, Exercises } from './objects';
+import { Background,SpriteSheetObject, Dimensions, Point, GameObject } from '../src/objects';
+import { keyCodes, isCollision, getRandomInt } from '../src/utils';
+import { Spaceship, Laser, Scoreboard, Astroid, Exercises, TouchButtons } from './objects';
+
+const isTouchDevice = () => {
+  return ('ontouchstart' in window) || window.TouchEvent || window.DocumentTouch && document instanceof DocumentTouch;
+};
 
 const keyCodeToDirectionMap = {
   [keyCodes.arrowup]: 90,
@@ -22,14 +26,40 @@ const world = new GameWorld('#container', {
   enableCollisionDetection: true,
 });
 
-let _spaceship, _scoreboard, _exercises = null;
+let _spaceship, _scoreboard, _exercises, _touchButtons = null;
+
+const checkWhichButtonPressed = (e) => {
+  if (_spaceship && _touchButtons) {
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const touchPoint = new GameObject(new Point(x / world.scale, y / world.scale), new Dimensions(10, 10));
+    
+    if (isCollision(_touchButtons.upButtonDimensions, touchPoint)) {
+      handleArrowKeys(keyCodes.arrowup, _spaceship);
+    }
+    if (isCollision(_touchButtons.downButtonDimensions, touchPoint)) {
+      handleArrowKeys(keyCodes.arrowdown, _spaceship);
+    }
+    if (isCollision(_touchButtons.shootButtonDimensions, touchPoint)) {
+      handleShootLaser(keyCodes.space, _spaceship);
+    }
+  }
+}
+
+world.on('touchstart', checkWhichButtonPressed);
+
+world.on('touchend', () => {
+  if (_spaceship) {
+    _spaceship.stop()
+  }
+});
 
 world.on('keydown', (keyCode) => {
   if (_spaceship) {
     handleArrowKeys(keyCode, _spaceship);
     handleShootLaser(keyCode, _spaceship);
   }
-  handleRestartGame(keyCode);
 });
 
 const handleArrowKeys = (keyCode, spaceship) => {
@@ -46,12 +76,6 @@ const handleShootLaser = (keyCode, spaceship) => {
   if (keyCode === keyCodes.space) {
     world.insert(new Laser(new Point((spaceship.point.x + (spaceship.dimensions.width)), (spaceship.point.y + (spaceship.dimensions.height / 2)))));
     world.getResource('shoot').play();
-  }
-};
-
-const handleRestartGame = (keyCode) => {
-  if (keyCode === keyCodes.enter && (world.isGameOver || !world.started)) {
-    startTheGame();
   }
 };
 
@@ -77,7 +101,7 @@ world.on('collisionDetected', ({ subject, target }) => {
         world.gameOver();
         world.showPopup({
           title: 'Game over!',
-          text: 'Druk op de "enter" toets om opnieuw te beginnen.',
+          buttons: [{ text: 'Opnieuw beginnen', onClick: startTheGame }],
         });
       });
   }
@@ -95,7 +119,7 @@ world.on('collisionDetected', ({ subject, target }) => {
       });
       _scoreboard.add(10);
     } else {
-      subject.move(180, (subject.speed * 1.5));
+      subject.move(180, (subject.speed * 1.3));
       target.move(180, target.fullSpeed);
     }
   }
@@ -131,23 +155,35 @@ const startTheGame = () => {
   const background = new Background(world.getResource('background'), world.dimensions);
   const scoreboard = new Scoreboard(world.getResource('dashboard'), new Point(0, world.dimensions.height - 120));
   const exercises = new Exercises();
-  
   _scoreboard = scoreboard;
   _spaceship = spaceship;
   _exercises = exercises;
-
+  
   world.closePopup();
   world.reset();
   world.insert(background);
   world.insert(scoreboard);
   world.insert(exercises);
   world.insert(spaceship);
+
+  if (isTouchDevice()) {
+    const touchButtons = new TouchButtons(world.dimensions);
+    _touchButtons = touchButtons;
+    world.insert(touchButtons);
+  }
+
   world.start();
 };
 
 world.showPopup({
   title: 'Klaar om te beginnen?',
-  text: [ 'Druk dan op de "enter" toets. <br /><br />',
+  text: [ (isTouchDevice()) ?
+          'Gebruik de pijlen om je ruimteschip te besturen en de rode knop om op een rots te schieten' :
           'Gebruik de pijltjes toetsen om je ruimteschip te besturen en de spatiebalk om een rots te schieten',
-        ].join(' '),
+          '',
+        ].join('<br /><br />'),
+  buttons: [{ text: 'Start', onClick: startTheGame }],
 });
+
+
+

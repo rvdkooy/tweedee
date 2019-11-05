@@ -2,6 +2,16 @@ export const getRandomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+export const isCollision = (subject, target) => {
+  if (subject.point.x < target.point.x + target.dimensions.width &&
+    subject.point.x + subject.dimensions.width > target.point.x &&
+    subject.point.y < target.point.y + target.dimensions.height &&
+    subject.point.y + subject.dimensions.height > target.point.y) {
+      return true;
+  }
+  return false;
+};
+
 export const keyCodes = {
     backspace: 8,
     tab: 9,

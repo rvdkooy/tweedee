@@ -11,7 +11,7 @@ function movementBehaviour() {
       this.direction = direction;
       
       if (speed !== undefined && speed !== null) {
-        this.speed = (this.options.easeIn) ? this.easeInValue : this.speed;
+        this.speed = (this.options.easeIn) ? this.easeInValue : speed;
         this.deltaX = (speed * Math.cos(direction * Math.PI / 180));
         this.deltaY = -(speed * Math.sin(direction * Math.PI / 180));
       }
@@ -25,7 +25,7 @@ function movementBehaviour() {
   
     this.checkBoundary = (speed) => {
       if (this.boundaries) {
-        if (this.direction === 0 && this.point.y - speed <= this.boundaries.top) {
+        if (this.direction === 90 && this.point.y - speed <= this.boundaries.top) {
           this.point.y = this.boundaries.top;
           this.stop();
         }
@@ -33,7 +33,7 @@ function movementBehaviour() {
         //   this.y = this.boundaries.top;
         //   this.stop();
         // }
-        if (this.direction === 180 && (this.point.y + speed + this.dimensions.height >= this.boundaries.bottom)) {
+        if (this.direction === 270 && (this.point.y + speed + this.dimensions.height >= this.boundaries.bottom)) {
           this.point.y = this.boundaries.bottom - this.dimensions.height;
           this.stop();
         }

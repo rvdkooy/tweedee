@@ -1,5 +1,6 @@
 import eventEmitter from './behaviours/eventEmitter';
 import { Dimensions } from './objects';
+import { isCollision } from './utils';
 
 export class GameWorld {
   constructor (selector, options) {
@@ -10,9 +11,9 @@ export class GameWorld {
     this.container = document.querySelector(selector);
 
     addResources.bind(this)(this.container, this.options);
-    addKeyListeners.bind(this)();
     eventEmitter.bind(this)();
     addCanvas.bind(this)(this.container, options);
+    addListeners.bind(this)();
     if (options.enableCollisionDetection) {
       addCollisionDetection.bind(this)();
     }
@@ -33,7 +34,7 @@ export class GameWorld {
   }
 
   clear() {
-    this.ctx.clearRect(0, 0, this.width, this.height)
+    this.ctx.clearRect(0, 0, this.scaler(this.dimensions.width), this.scaler(this.dimensions.height));
   }
 
   gameLoop() {
@@ -79,6 +80,8 @@ export class GameWorld {
       content.buttons.forEach(b => {
         const button = document.createElement('button');
         button.innerHTML = b.text;
+        button.style.padding = '16px';
+        button.style.fontWeight = '700';
         button.addEventListener('click', b.onClick);
         modalContent.appendChild(button);
       });
@@ -126,7 +129,7 @@ const addResources = function (container, options) {
   }
 }
 
-const addKeyListeners = function() {
+const addListeners = function() {
   this.keysDown = [];
   
   window.addEventListener('keydown', (e) => {
@@ -135,13 +138,26 @@ const addKeyListeners = function() {
   });
 
   window.addEventListener('keyup', (e) => {
-    this.keydown = this.keysDown.filter(x => x !== e.keyCode);
-    
-    if (this.listeners['keyup']) {
-      this.listeners['keyup'].forEach(listener => {
-        listener(e.keyCode);
-      });
-    }
+    this.keydowns = this.keysDown.filter(x => x !== e.keyCode);
+    this.emit('keyup', e.keyCode);
+  });
+
+  this.canvas.addEventListener('mousedown', (e) => {
+    this.emit('mousedown', e);
+  });
+
+  this.canvas.addEventListener('mouseup', (e) => {
+    this.emit('mouseup', e);
+  });
+
+  this.canvas.addEventListener('touchstart', (e) => {
+    // e.preventDefault();
+    this.emit('touchstart', e);
+  });
+
+  this.canvas.addEventListener('touchend', (e) => {
+    // e.preventDefault();
+    this.emit('touchend', e);
   });
 };
 
@@ -175,9 +191,9 @@ const addCanvas = function (container, options) {
   container.appendChild(canvas);
   this.calculateDimensions(canvas);
   this.ctx = canvas.getContext("2d");
-  
   window.addEventListener('resize', () => this.calculateDimensions(canvas));
   canvas.focus();
+  this.canvas = canvas;
 };
 
 const addCollisionDetection = function () {
@@ -185,10 +201,7 @@ const addCollisionDetection = function () {
     const collisionables = world.gameObjects.filter(x => x.collisionDetection);
     collisionables.forEach(subject => {
       collisionables.filter(x => x !== subject).forEach(target => {
-        if (subject.point.x < target.point.x + target.dimensions.width &&
-          subject.point.x + subject.dimensions.width > target.point.x &&
-          subject.point.y < target.point.y + target.dimensions.height &&
-          subject.point.y + subject.dimensions.height > target.point.y) {
+        if (isCollision(subject, target)) {
             world.emit('collisionDetected', { subject, target });
         }
       });

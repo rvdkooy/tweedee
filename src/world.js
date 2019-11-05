@@ -151,12 +151,12 @@ const addListeners = function() {
   });
 
   this.canvas.addEventListener('touchstart', (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     this.emit('touchstart', e);
   });
 
   this.canvas.addEventListener('touchend', (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     this.emit('touchend', e);
   });
 };
